@@ -2,7 +2,6 @@ library(data.table)
 library(ggplot2)
 
 remotes::install_github("grimbough/FITfileR")
-
 library(FITfileR)
 
 activity_dt <- fread("strava_data/activities.csv") |>
@@ -65,15 +64,10 @@ fit_list <- lapply(
     UnzipAndRead
 )
 
-rbindlist(FITfileR::records(fit_list[[1]]),
-    fill = TRUE
-)
-
 record_list <- lapply(
     fit_list,
     \(fit) FITfileR::records(fit)
 )
-
 
 record_dt <- record_list |>
     lapply(\(data){
