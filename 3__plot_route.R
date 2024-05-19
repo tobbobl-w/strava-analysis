@@ -9,7 +9,7 @@ map <- record_dt[order(timestamp)] |>
         !is.na(speed) &
             gps_accuracy == 3 &
             !is.na(distance),
-        .(position_long, position_lat)
+        .(position_long, posiion_lat)
     ] |>
     as.matrix() |>
     leaflet() |>

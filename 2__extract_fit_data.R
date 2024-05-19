@@ -16,28 +16,56 @@ activity_dt[, activity_day := as.IDate(
 istanbul_trip <- activity_dt[
     activity_day >= "2022-06-25" &
         activity_day <= "2022-08-05"
-]
+][order(activity_day)]
 
-cumlative_km_plot <- istanbul_trip[
-    , .(daily_distance = sum(distance)),
+daily_data <- istanbul_trip[
+    , .(
+        daily_distance = sum(distance),
+        daily_elevation = sum(elevation_gain),
+        daily_ratio = sum(elevation_gain) / sum(distance)
+    ),
     activity_day
 ] |>
-    _[order(activity_day), cumlative_distance := cumsum(daily_distance)] |>
+    _[, ":="(
+        cumlative_distance = cumsum(daily_distance),
+        cumlative_elevation = cumsum(daily_elevation))] |>
+    _[, cumlative_ratio := cumlative_elevation / cumlative_distance]
+
+daily_data |>
+    ggplot(aes(
+        x = activity_day,
+        y = cumlative_ratio
+    )) +
+    geom_point()
+
+daily_data |>
+    melt(
+        id.var = "activity_day",
+        measure.vars = patterns("cumlative")
+    ) |>
     ggplot(
         aes(
             x = activity_day,
-            y = cumlative_distance
+            y = value,
+            colour = variable
         )
     ) +
     geom_point() +
     geom_line() +
     theme_minimal() +
+    facet_grid(
+        rows = vars(variable),
+        scales = "free"
+    ) +
     labs(
         x = "Date",
         y = "Kilometers",
-        title = "Istanbul trip daily distance"
+        title = "Istanbul trip statistics"
     ) +
     theme(plot.title = element_text(hjust = 0.5))
+
+
+
 
 ggsave(
     "output/cumlative_distance_plot.pdf",
