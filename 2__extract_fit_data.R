@@ -1,5 +1,7 @@
+library(renv)
 library(data.table)
 library(ggplot2)
+library(httpgd)
 
 remotes::install_github("grimbough/FITfileR")
 library(FITfileR)
@@ -63,9 +65,6 @@ daily_data |>
         title = "Istanbul trip statistics"
     ) +
     theme(plot.title = element_text(hjust = 0.5))
-
-
-
 
 ggsave(
     "output/cumlative_distance_plot.pdf",
